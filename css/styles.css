@@ -138,3 +138,20 @@ body {
 .lightbox__button:focus {
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+.lightbox__swaipe {
+  position: absolute;
+  top: 50%;
+  z-index: 100;
+  width: 50px;
+  height: 70px;
+  border: none;
+  background-color: teal;
+  transform: translateY(-50%);
+}
+.lightbox__swaipe.lightbox__swaipe-left {
+  left: 10px;
+}
+.lightbox__swaipe.lightbox__swaipe-right {
+  right: 10px;
+}

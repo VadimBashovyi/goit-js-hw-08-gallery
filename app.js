@@ -1,72 +1,9 @@
-const galleryItems = [
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2019/05/14/16/43/himilayan-blue-poppy-4202825__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2019/05/14/16/43/himilayan-blue-poppy-4202825_1280.jpg',
-    description: 'Hokkaido Flower',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2019/05/14/22/05/container-4203677__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2019/05/14/22/05/container-4203677_1280.jpg',
-    description: 'Container Haulage Freight',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2019/05/16/09/47/beach-4206785__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2019/05/16/09/47/beach-4206785_1280.jpg',
-    description: 'Aerial Beach View',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2016/11/18/16/19/flowers-1835619__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2016/11/18/16/19/flowers-1835619_1280.jpg',
-    description: 'Flower Blooms',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2018/09/13/10/36/mountains-3674334__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2018/09/13/10/36/mountains-3674334_1280.jpg',
-    description: 'Alpine Mountains',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2019/05/16/23/04/landscape-4208571__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2019/05/16/23/04/landscape-4208571_1280.jpg',
-    description: 'Mountain Lake Sailing',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2019/05/17/09/27/the-alps-4209272__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2019/05/17/09/27/the-alps-4209272_1280.jpg',
-    description: 'Alpine Spring Meadows',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2019/05/16/21/10/landscape-4208255__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2019/05/16/21/10/landscape-4208255_1280.jpg',
-    description: 'Nature Landscape',
-  },
-  {
-    preview:
-      'https://cdn.pixabay.com/photo/2019/05/17/04/35/lighthouse-4208843__340.jpg',
-    original:
-      'https://cdn.pixabay.com/photo/2019/05/17/04/35/lighthouse-4208843_1280.jpg',
-    description: 'Lighthouse Coast Sea',
-  },
-]
+import galleryItems from './refs.js'
 // получаемо доступ
 const imgGallery = document.querySelector(`ul.js-gallery`)
 const modalWindow = document.querySelector(`.js-lightbox`)
 const modalImg = document.querySelector(`img.lightbox__image`)
+
 // *
 imgGallery.insertAdjacentHTML('afterbegin', createImgGallery(galleryItems))
 imgGallery.addEventListener('click', clickGalleryImg)
@@ -76,15 +13,27 @@ function createImgGallery(el) {
     .map(({ preview, original, description }) => {
       return `<li class="gallery__item">
     <a class="gallery__link" href = "${original}">
-    <img class="gallery__image" src="${preview}" data-source="${original}" alt="${description}"/></a></li>`
+    <img class="gallery__image" src="${preview}" data-source="${original}"  alt="${description}"/></a></li>`
     })
     .join('')
 }
 
-modalWindow.addEventListener('click', (temp) => {
-  temp.target.classList.contains(`lightbox__overlay`)
-    ? temp.target.dataset.action === `close-lightbox`
-    : closeModalImg()
+modalWindow.addEventListener('click', (e) => {
+  if (
+    e.target.classList.contains('lightbox__overlay') ||
+    e.target.dataset.action === 'close-lightbox'
+  ) {
+    closeModalImg()
+  }
+  if (
+    e.target.classList.contains('lightbox__image') ||
+    e.target.dataset.type === 'swaipe-left'
+  ) {
+    onLeftClickBtn()
+  }
+  if (e.target.dataset.type === 'swaipe-right') {
+    onRightClickBtn()
+  }
 })
 
 function modalSrc(src, alt) {
@@ -93,6 +42,9 @@ function modalSrc(src, alt) {
 }
 
 function clickGalleryImg(element) {
+  window.addEventListener('keydown', onClickEsc)
+  window.addEventListener('keydown', onPressArrowLeft)
+  window.addEventListener('keydown', onPressArrowRight)
   if (!element.target.classList.contains('gallery__image')) return
   element.preventDefault()
   modalWindow.classList.add('is-open')
@@ -100,6 +52,77 @@ function clickGalleryImg(element) {
 }
 
 function closeModalImg(e) {
+  window.removeEventListener('keydown', onPressArrowLeft)
+  window.removeEventListener('keydown', onPressArrowRight)
+  window.removeEventListener('keydown', onClickEsc)
   modalWindow.classList.remove('is-open')
   modalSrc('', '')
+}
+
+function onClickEsc(event) {
+  if (event.code === 'Escape') {
+    closeModalImg()
+  }
+}
+// swaipe
+
+// const swaipeLeftImg = document.querySelector('.lightbox__swaipe-left')
+// const swaipeRightImg = document.querySelector('.lightbox__swaipe-right')
+
+// function onLeftClickBtn(event) {
+//   for (let i = 0; i < galleryItems.length; i += 1) {
+//     if (modalImg.src === galleryItems[i].original) {
+//       let swaipeNextImgGallery = i + 1
+//       if (swaipeNextImgGallery > galleryItems.length - 1)
+//         swaipeNextImgGallery = 0
+//     }
+//     modalImg.src = galleryItems[swaipeNextImgGallery].original
+//     return
+//   }
+// }
+
+// function onRightClickBtn(event) {
+//   for (let i = 0; i < galleryItems.length; i += 1) {
+//     if (modalImg.src === galleryItems[i].original) {
+//       let swaipeNextImgGallery = i - 1
+//       if (swaipeNextImgGallery < 0) {
+//         swaipeNextImgGallery = galleryItems.length - 1
+//       }
+//     }
+//     modalImg.src = galleryItems[swaipeNextImgGallery].original
+//     return
+//   }
+// }
+// *
+function indexImgGallery(src) {
+  return galleryItems.indexOf(galleryItems.find((el) => el.original === src))
+}
+
+function onLeftClickBtn() {
+  let isIndexImgNew = indexImgGallery(modalImg.getAttribute('src'))
+  if (isIndexImgNew === galleryItems.length - 1) isIndexImgNew = -1
+  modalSrc(
+    galleryItems[isIndexImgNew + 1].original,
+    galleryItems[isIndexImgNew + 1].description,
+  )
+}
+
+function onRightClickBtn() {
+  let isIndexImgNew = indexImgGallery(modalImg.getAttribute('src'))
+  if (isIndexImgNew == 0) isIndexImgNew = galleryItems.length
+  modalSrc(
+    galleryItems[isIndexImgNew - 1].original,
+    galleryItems[isIndexImgNew - 1].description,
+  )
+}
+
+function onPressArrowLeft(event) {
+  if (event.code === 'ArrowLeft') {
+    onLeftClickBtn()
+  }
+}
+function onPressArrowRight(event) {
+  if (event.code === 'ArrowRight') {
+    onRightClickBtn()
+  }
 }
